@@ -3,9 +3,9 @@ export interface PDF {
   id: string;
   name: string;
   status: PDFStatus;
-  url?: string;
-  createdAt: string;
-  updatedAt: string;
+  url?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export type PDFStatus = "pending" | "processing" | "completed" | "failed";
