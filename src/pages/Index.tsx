@@ -31,47 +31,52 @@ const Index = () => {
     }
   });
 
-  // Upload PDF to Supabase Storage and create database entry
-  const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const fileName = file.name;
-      const filePath = `pdfs/${fileName}`;
-
-      // Upload to Storage
-      const { error: uploadError, data } = await supabase.storage
-        .from('pdf-storage')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // Create database entry
-      const { error: dbError } = await supabase
-        .from('pdfs')
-        .insert([{
-          name: fileName,
-          status: 'pending',
-          url: data?.path,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }]);
-
-      if (dbError) throw dbError;
+  // Start PDF crawling
+  const crawlMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('crawl-pdfs');
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pdfs'] });
       toast({
         title: "Success",
-        description: "PDF uploaded successfully",
+        description: "PDFs crawled and uploaded successfully",
       });
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to upload PDF: " + error.message,
+        description: "Failed to crawl PDFs: " + error.message,
         variant: "destructive",
       });
     }
   });
+
+  const handleStartCrawling = useCallback(async () => {
+    setIsCrawling(true);
+    setProgress(0);
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 500);
+
+    try {
+      await crawlMutation.mutateAsync();
+      setProgress(100);
+    } finally {
+      clearInterval(interval);
+      setIsCrawling(false);
+      setProgress(0);
+    }
+  }, [crawlMutation]);
 
   const handlePreview = (pdf: PDF) => {
     setPreviewPdf(pdf);
@@ -108,33 +113,6 @@ const Index = () => {
     });
   };
 
-  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsCrawling(true);
-    setProgress(0);
-
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(interval);
-          return 90;
-        }
-        return prev + 10;
-      });
-    }, 500);
-
-    try {
-      await uploadMutation.mutateAsync(file);
-      setProgress(100);
-    } finally {
-      clearInterval(interval);
-      setIsCrawling(false);
-      setProgress(0);
-    }
-  }, [uploadMutation]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -153,28 +131,22 @@ const Index = () => {
             {currentSection === "egypt-gazette" ? "Egypt Gazette Extraction" : "Mapping"}
           </h2>
           <div className="flex gap-4">
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handleFileUpload}
-              className="hidden"
-              id="pdf-upload"
-            />
-            <label
-              htmlFor="pdf-upload"
-              className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 cursor-pointer ${
+            <button
+              onClick={handleStartCrawling}
+              className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 ${
                 isCrawling ? 'opacity-50 cursor-not-allowed' : ''
               }`}
+              disabled={isCrawling}
             >
               {isCrawling ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading ({progress}%)
+                  Crawling ({progress}%)
                 </>
               ) : (
-                "Upload PDF"
+                "Start Crawling"
               )}
-            </label>
+            </button>
           </div>
         </div>
 
