@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { PDFHeader } from "@/components/pdf/PDFHeader";
 import { PDFTable } from "@/components/pdf/PDFTable";
@@ -8,7 +7,7 @@ import { PDF } from "@/types/pdf";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { toast } = useToast();
