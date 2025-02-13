@@ -24,7 +24,7 @@ export const PDFTable = ({ pdfs, onPreview, onParse, onExport }: PDFTableProps) 
               <TableCell>
                 <PDFStatusBadge status={pdf.status} />
               </TableCell>
-              <TableCell>{new Date(pdf.createdAt).toLocaleDateString()}</TableCell>
+              <TableCell>{new Date(pdf.created_at).toLocaleDateString()}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   <Button
