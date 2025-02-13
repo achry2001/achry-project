@@ -86,6 +86,10 @@ serve(async (req) => {
       }
     }
 
+    if (processedPdfs.length === 0) {
+      throw new Error("No PDFs were successfully processed");
+    }
+
     return new Response(
       JSON.stringify({ 
         message: 'PDF crawling completed successfully',
