@@ -1,8 +1,8 @@
-
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { PDFHeader } from "@/components/pdf/PDFHeader";
 import { PDFTable } from "@/components/pdf/PDFTable";
 import { PDFPreviewModal } from "@/components/pdf/PDFPreviewModal";
+import { PDFFilters } from "@/components/pdf/PDFFilters";
 import { PDF } from "@/types/pdf";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -17,6 +17,12 @@ const Index = () => {
   const [isCrawling, setIsCrawling] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  // Filtering and pagination state
+  const [nameFilter, setNameFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [displayLimit, setDisplayLimit] = useState(10);
+
   // Fetch PDFs from Supabase
   const { data: pdfs = [], isLoading } = useQuery({
     queryKey: ['pdfs'],
@@ -30,6 +36,31 @@ const Index = () => {
       return data as PDF[];
     }
   });
+
+  // Filter and paginate PDFs
+  const filteredPdfs = useMemo(() => {
+    return pdfs.filter((pdf) => {
+      const nameMatch = pdf.name.toLowerCase().includes(nameFilter.toLowerCase());
+      const statusMatch = !statusFilter || pdf.status === statusFilter;
+      return nameMatch && statusMatch;
+    });
+  }, [pdfs, nameFilter, statusFilter]);
+
+  const paginatedPdfs = useMemo(() => {
+    const startIndex = (currentPage - 1) * displayLimit;
+    const endIndex = startIndex + displayLimit;
+    return filteredPdfs.slice(startIndex, endIndex);
+  }, [filteredPdfs, currentPage, displayLimit]);
+
+  const totalPages = Math.ceil(filteredPdfs.length / displayLimit);
+
+  // Reset page when filters change
+  const handleFilterChange = useCallback((type: "name" | "status" | "limit", value: string) => {
+    setCurrentPage(1);
+    if (type === "name") setNameFilter(value);
+    if (type === "status") setStatusFilter(value);
+    if (type === "limit") setDisplayLimit(Number(value));
+  }, []);
 
   // Start PDF crawling
   const crawlMutation = useMutation({
@@ -79,7 +110,11 @@ const Index = () => {
   }, [crawlMutation]);
 
   const handlePreview = (pdf: PDF) => {
-    setPreviewPdf(pdf);
+    const { data } = supabase.storage.from('pdf-storage').getPublicUrl(pdf.url || "");
+    setPreviewPdf({
+      ...pdf,
+      url: data.publicUrl
+    });
   };
 
   const handleParse = async (pdf: PDF) => {
@@ -161,11 +196,23 @@ const Index = () => {
           </div>
         )}
 
+        <PDFFilters
+          nameFilter={nameFilter}
+          onNameFilterChange={(value) => handleFilterChange("name", value)}
+          statusFilter={statusFilter}
+          onStatusFilterChange={(value) => handleFilterChange("status", value)}
+          displayLimit={displayLimit}
+          onDisplayLimitChange={(value) => handleFilterChange("limit", value)}
+        />
+
         <PDFTable
-          pdfs={pdfs}
+          pdfs={paginatedPdfs}
           onPreview={handlePreview}
           onParse={handleParse}
           onExport={handleExport}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          totalPages={totalPages}
         />
 
         {previewPdf && (
