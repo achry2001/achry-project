@@ -7,6 +7,7 @@ import { PDFCrawlingProgress } from "./PDFCrawlingProgress";
 import { PDF } from "@/types/pdf";
 import { supabase } from "@/integrations/supabase/client";
 import { usePDFOperations } from "@/hooks/usePDFOperations";
+import { Loader2 } from "lucide-react";
 
 export const PDFManagementContainer = () => {
   const { pdfs, isLoading, crawlMutation, deleteMutation } = usePDFOperations();
