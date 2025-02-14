@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useMemo } from "react";
 import { PDFHeader } from "@/components/pdf/PDFHeader";
 import { PDFTable } from "@/components/pdf/PDFTable";
@@ -149,6 +148,43 @@ const Index = () => {
     });
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: async (pdf: PDF) => {
+      if (pdf.url) {
+        const { error: storageError } = await supabase.storage
+          .from('pdf-storage')
+          .remove([pdf.url]);
+        
+        if (storageError) throw storageError;
+      }
+
+      const { error: dbError } = await supabase
+        .from('pdfs')
+        .delete()
+        .eq('id', pdf.id);
+      
+      if (dbError) throw dbError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pdfs'] });
+      toast({
+        title: "Success",
+        description: "PDF deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete PDF: " + error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleDelete = async (pdf: PDF) => {
+    await deleteMutation.mutateAsync(pdf);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -158,18 +194,18 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
       
       <main className="max-w-7xl mx-auto mt-24 px-8 py-6">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-blue-900">
             {currentSection === "egypt-gazette" ? "Egypt Gazette Extraction" : "Mapping"}
           </h2>
           <div className="flex gap-4">
             <button
               onClick={handleStartCrawling}
-              className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 ${
+              className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 ${
                 isCrawling ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               disabled={isCrawling}
@@ -190,7 +226,7 @@ const Index = () => {
           <div className="mb-8">
             <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gray-900 transition-all duration-500"
+                className="h-full bg-blue-600 transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -211,6 +247,7 @@ const Index = () => {
           onPreview={handlePreview}
           onParse={handleParse}
           onExport={handleExport}
+          onDelete={handleDelete}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           totalPages={totalPages}
