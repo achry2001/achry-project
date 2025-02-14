@@ -34,12 +34,15 @@ export const PDFManagementContainer = () => {
   }, [pdfs, nameFilter, statusFilter]);
 
   const paginatedPdfs = useMemo(() => {
+    if (displayLimit === -1) {
+      return filteredPdfs;
+    }
     const startIndex = (currentPage - 1) * displayLimit;
     const endIndex = startIndex + displayLimit;
     return filteredPdfs.slice(startIndex, endIndex);
   }, [filteredPdfs, currentPage, displayLimit]);
 
-  const totalPages = Math.ceil(filteredPdfs.length / displayLimit);
+  const totalPages = displayLimit === -1 ? 1 : Math.ceil(filteredPdfs.length / displayLimit);
 
   // Handlers
   const handleFilterChange = useCallback((type: "name" | "status" | "limit", value: string) => {
