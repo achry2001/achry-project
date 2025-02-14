@@ -1,12 +1,7 @@
 
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PDFStatus } from "@/types/pdf";
 
 interface PDFFiltersProps {
   nameFilter: string;
@@ -25,41 +20,42 @@ export const PDFFilters = ({
   displayLimit,
   onDisplayLimitChange,
 }: PDFFiltersProps) => {
+  const statusOptions: PDFStatus[] = ["pending", "processing", "completed", "failed"];
+  const limitOptions = [10, 20, 50];
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex gap-4 mb-4">
       <div className="flex-1">
         <Input
-          placeholder="Search by PDF name..."
+          placeholder="Filter by PDF name..."
           value={nameFilter}
           onChange={(e) => onNameFilterChange(e.target.value)}
-          className="border-blue-200"
+          className="max-w-xs"
         />
       </div>
       <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-        <SelectTrigger className="w-[180px] border-blue-200">
-          <SelectValue placeholder="Select status" />
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Status</SelectItem>
-          <SelectItem value="pending">Pending</SelectItem>
-          <SelectItem value="processing">Processing</SelectItem>
-          <SelectItem value="completed">Completed</SelectItem>
-          <SelectItem value="failed">Failed</SelectItem>
+          <SelectItem value="all">All statuses</SelectItem>
+          {statusOptions.map((status) => (
+            <SelectItem key={status} value={status}>
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
-      <Select
-        value={displayLimit.toString()}
-        onValueChange={onDisplayLimitChange}
-      >
-        <SelectTrigger className="w-[180px] border-blue-200">
+      <Select value={displayLimit.toString()} onValueChange={onDisplayLimitChange}>
+        <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Display limit" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="10">10 per page</SelectItem>
-          <SelectItem value="25">25 per page</SelectItem>
-          <SelectItem value="50">50 per page</SelectItem>
-          <SelectItem value="100">100 per page</SelectItem>
-          <SelectItem value="-1">Show All</SelectItem>
+          {limitOptions.map((limit) => (
+            <SelectItem key={limit} value={limit.toString()}>
+              {limit} per page
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

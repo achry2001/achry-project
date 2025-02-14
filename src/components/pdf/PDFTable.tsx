@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Eye, FileDown, Play, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { PDF, PDFTableProps } from "@/types/pdf";
 import { PDFStatusBadge } from "./PDFStatusBadge";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface ExtendedPDFTableProps extends PDFTableProps {
   currentPage: number;
@@ -23,37 +22,12 @@ export const PDFTable = ({
   onPageChange,
   totalPages 
 }: ExtendedPDFTableProps) => {
-  const [selectedPDFs, setSelectedPDFs] = React.useState<string[]>([]);
-
-  const toggleSelectAll = () => {
-    if (selectedPDFs.length === pdfs.length) {
-      setSelectedPDFs([]);
-    } else {
-      setSelectedPDFs(pdfs.map(pdf => pdf.id));
-    }
-  };
-
-  const toggleSelect = (pdfId: string) => {
-    setSelectedPDFs(prev => 
-      prev.includes(pdfId) 
-        ? prev.filter(id => id !== pdfId)
-        : [...prev, pdfId]
-    );
-  };
-
   return (
     <div className="w-full">
       <div className="overflow-hidden rounded-lg border border-blue-100 bg-white/50 backdrop-blur-sm">
         <Table>
-          <TableHeader className="[&_tr:hover]:bg-transparent">
-            <TableRow className="bg-blue-600 hover:bg-blue-600">
-              <TableHead className="text-white font-semibold w-[50px]">
-                <Checkbox 
-                  checked={selectedPDFs.length === pdfs.length && pdfs.length > 0}
-                  onCheckedChange={toggleSelectAll}
-                  className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-600"
-                />
-              </TableHead>
+          <TableHeader>
+            <TableRow className="bg-blue-600">
               <TableHead className="text-white font-semibold">PDF Name</TableHead>
               <TableHead className="text-white font-semibold">Status</TableHead>
               <TableHead className="text-white font-semibold">Created At</TableHead>
@@ -63,13 +37,6 @@ export const PDFTable = ({
           <TableBody>
             {pdfs.map((pdf) => (
               <TableRow key={pdf.id} className="hover:bg-blue-50/30">
-                <TableCell>
-                  <Checkbox 
-                    checked={selectedPDFs.includes(pdf.id)}
-                    onCheckedChange={() => toggleSelect(pdf.id)}
-                    className="border-blue-200"
-                  />
-                </TableCell>
                 <TableCell className="font-medium text-gray-700">{pdf.name}</TableCell>
                 <TableCell>
                   <PDFStatusBadge status={pdf.status} />
