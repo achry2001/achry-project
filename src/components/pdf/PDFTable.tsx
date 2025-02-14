@@ -27,11 +27,11 @@ export const PDFTable = ({
       <div className="overflow-hidden rounded-lg border border-blue-100 bg-white/50 backdrop-blur-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-blue-50/50">
-              <TableHead className="text-blue-900">PDF Name</TableHead>
-              <TableHead className="text-blue-900">Status</TableHead>
-              <TableHead className="text-blue-900">Created At</TableHead>
-              <TableHead className="text-right text-blue-900">Actions</TableHead>
+            <TableRow className="bg-blue-600">
+              <TableHead className="text-white font-semibold">PDF Name</TableHead>
+              <TableHead className="text-white font-semibold">Status</TableHead>
+              <TableHead className="text-white font-semibold">Created At</TableHead>
+              <TableHead className="text-right text-white font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
