@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useMemo } from "react";
 import { PDFTable } from "./PDFTable";
 import { PDFFilters } from "./PDFFilters";
@@ -8,8 +7,12 @@ import { PDF } from "@/types/pdf";
 import { supabase } from "@/integrations/supabase/client";
 import { usePDFOperations } from "@/hooks/usePDFOperations";
 import { Loader2 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 export const PDFManagementContainer = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { pdfs, isLoading, crawlMutation, deleteMutation } = usePDFOperations();
   const [previewPdf, setPreviewPdf] = useState<PDF | null>(null);
   const [isCrawling, setIsCrawling] = useState(false);
@@ -70,6 +73,32 @@ export const PDFManagementContainer = () => {
     }
   }, [crawlMutation]);
 
+  const parseMutation = useMutation({
+    mutationFn: async (pdf: PDF) => {
+      const { error } = await supabase
+        .from('pdfs')
+        .update({ status: 'processing' })
+        .eq('id', pdf.id);
+      
+      if (error) throw error;
+      return pdf;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pdfs'] });
+      toast({
+        title: "Success",
+        description: "PDF has been queued for processing",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to process PDF: " + error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   const handlePreview = (pdf: PDF) => {
     const { data } = supabase.storage.from('pdf-storage').getPublicUrl(pdf.url || "");
     setPreviewPdf({
@@ -78,15 +107,8 @@ export const PDFManagementContainer = () => {
     });
   };
 
-  const handleParse = async (pdf: PDF) => {
-    const { error } = await supabase
-      .from('pdfs')
-      .update({ status: 'processing' })
-      .eq('id', pdf.id);
-
-    if (!error) {
-      window.location.reload();
-    }
+  const handleParse = (pdf: PDF) => {
+    parseMutation.mutate(pdf);
   };
 
   const handleExport = (pdf: PDF) => {

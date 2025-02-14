@@ -31,7 +31,7 @@ export const PDFTable = ({
               <TableHead className="text-white font-semibold">PDF Name</TableHead>
               <TableHead className="text-white font-semibold">Status</TableHead>
               <TableHead className="text-white font-semibold">Created At</TableHead>
-              <TableHead className="text-right text-white font-semibold">Actions</TableHead>
+              <TableHead className="text-center text-white font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -42,8 +42,8 @@ export const PDFTable = ({
                   <PDFStatusBadge status={pdf.status} />
                 </TableCell>
                 <TableCell className="text-gray-600">{new Date(pdf.created_at).toLocaleDateString()}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
+                <TableCell className="text-center">
+                  <div className="flex justify-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
