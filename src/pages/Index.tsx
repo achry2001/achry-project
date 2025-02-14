@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useMemo } from "react";
 import { PDFHeader } from "@/components/pdf/PDFHeader";
 import { PDFTable } from "@/components/pdf/PDFTable";
@@ -19,7 +20,7 @@ const Index = () => {
 
   // Filtering and pagination state
   const [nameFilter, setNameFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [displayLimit, setDisplayLimit] = useState(10);
 
@@ -41,7 +42,7 @@ const Index = () => {
   const filteredPdfs = useMemo(() => {
     return pdfs.filter((pdf) => {
       const nameMatch = pdf.name.toLowerCase().includes(nameFilter.toLowerCase());
-      const statusMatch = !statusFilter || pdf.status === statusFilter;
+      const statusMatch = statusFilter === 'all' || pdf.status === statusFilter;
       return nameMatch && statusMatch;
     });
   }, [pdfs, nameFilter, statusFilter]);
