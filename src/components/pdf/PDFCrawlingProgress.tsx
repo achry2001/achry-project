@@ -7,6 +7,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+interface JournalSource {
+  id: number;
+  name: string;
+  value: string;
+}
 
 interface PDFCrawlingProgressProps {
   isCrawling: boolean;
@@ -15,6 +23,19 @@ interface PDFCrawlingProgressProps {
 }
 
 export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: PDFCrawlingProgressProps) => {
+  const { data: journalSources, isLoading: isLoadingSources } = useQuery({
+    queryKey: ['journalSources'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('journal_sources')
+        .select('*')
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return data as JournalSource[];
+    }
+  });
+
   return (
     <>
       <div className="flex justify-between items-center mb-8">
@@ -24,10 +45,14 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
         <div className="flex gap-4 items-center">
           <Select>
             <SelectTrigger className="w-[180px] border-blue-200">
-              <SelectValue placeholder="Select source" />
+              <SelectValue placeholder={isLoadingSources ? "Loading..." : "Select source"} />
             </SelectTrigger>
             <SelectContent>
-              {/* Values will be populated later */}
+              {journalSources?.map((source) => (
+                <SelectItem key={source.id} value={source.value}>
+                  {source.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <button
