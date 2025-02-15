@@ -58,9 +58,14 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
   const refreshDates = async () => {
     try {
       setIsScrapingDates(true);
-      const response = await supabase.functions.invoke('scrape-dates');
+      const response = await supabase.functions.invoke('scrape-dates', {
+        method: 'POST'
+      });
       
-      if (response.error) throw new Error(response.error.message);
+      if (response.error) {
+        console.error("Function error:", response.error);
+        throw new Error(response.error.message);
+      }
       
       // Refresh the sources list
       await queryClient.invalidateQueries({ queryKey: ['journalSources'] });
@@ -70,6 +75,7 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
         description: "Journal dates updated successfully",
       });
     } catch (error) {
+      console.error("Error in refreshDates:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to update journal dates",
