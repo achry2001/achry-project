@@ -1,5 +1,12 @@
 
 import { Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PDFCrawlingProgressProps {
   isCrawling: boolean;
@@ -14,7 +21,15 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
         <h2 className="text-xl font-semibold text-blue-900">
           Egypt Gazette Extraction
         </h2>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
+          <Select>
+            <SelectTrigger className="w-[180px] border-blue-200">
+              <SelectValue placeholder="Select source" />
+            </SelectTrigger>
+            <SelectContent>
+              {/* Values will be populated later */}
+            </SelectContent>
+          </Select>
           <button
             onClick={onStartCrawling}
             className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 ${

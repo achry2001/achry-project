@@ -24,7 +24,7 @@ export const PDFManagementContainer = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [displayLimit, setDisplayLimit] = useState(10);
 
-  // Filter and paginate PDFs
+  // Filter PDFs
   const filteredPdfs = useMemo(() => {
     return pdfs.filter((pdf) => {
       const nameMatch = pdf.name.toLowerCase().includes(nameFilter.toLowerCase());
@@ -33,6 +33,26 @@ export const PDFManagementContainer = () => {
     });
   }, [pdfs, nameFilter, statusFilter]);
 
+  const handleBulkDelete = async () => {
+    try {
+      for (const pdf of filteredPdfs) {
+        await deleteMutation.mutateAsync(pdf);
+      }
+      
+      toast({
+        title: "Success",
+        description: `Successfully deleted ${filteredPdfs.length} PDFs`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete some PDFs",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Filter and paginate PDFs
   const paginatedPdfs = useMemo(() => {
     const startIndex = (currentPage - 1) * displayLimit;
     const endIndex = startIndex + displayLimit;
@@ -138,6 +158,7 @@ export const PDFManagementContainer = () => {
         onStatusFilterChange={(value) => handleFilterChange("status", value)}
         displayLimit={displayLimit}
         onDisplayLimitChange={(value) => handleFilterChange("limit", value)}
+        onBulkDelete={handleBulkDelete}
       />
 
       <PDFTable
