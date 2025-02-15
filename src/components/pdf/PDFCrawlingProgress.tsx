@@ -58,13 +58,20 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
   const refreshDates = async () => {
     try {
       setIsScrapingDates(true);
+      console.log("Calling edge function...");
+      
       const response = await supabase.functions.invoke('scrape-dates', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
+      
+      console.log("Edge function response:", response);
       
       if (response.error) {
         console.error("Function error:", response.error);
-        throw new Error(response.error.message);
+        throw new Error(response.error.message || "Failed to call edge function");
       }
       
       // Refresh the sources list
