@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface JournalSource {
   id: number;
@@ -23,6 +25,9 @@ interface PDFCrawlingProgressProps {
 }
 
 export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: PDFCrawlingProgressProps) => {
+  const { toast } = useToast();
+  const [selectedSource, setSelectedSource] = useState<string>("");
+
   const { data: journalSources, isLoading: isLoadingSources } = useQuery({
     queryKey: ['journalSources'],
     queryFn: async () => {
@@ -31,10 +36,24 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
         .select('*')
         .order('name', { ascending: true });
       
-      if (error) throw error;
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load journal sources",
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      console.log("Loaded journal sources:", data); // Debug log
       return data as JournalSource[];
     }
   });
+
+  const handleSourceChange = (value: string) => {
+    console.log("Selected source:", value); // Debug log
+    setSelectedSource(value);
+  };
 
   return (
     <>
@@ -43,7 +62,7 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
           Egypt Gazette Extraction
         </h2>
         <div className="flex gap-4 items-center">
-          <Select>
+          <Select value={selectedSource} onValueChange={handleSourceChange}>
             <SelectTrigger className="w-[180px] border-blue-200">
               <SelectValue placeholder={isLoadingSources ? "Loading..." : "Select source"} />
             </SelectTrigger>
@@ -60,7 +79,7 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
             className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 ${
               isCrawling ? 'opacity-50 cursor-not-allowed' : ''
             }`}
-            disabled={isCrawling}
+            disabled={isCrawling || !selectedSource}
           >
             {isCrawling ? (
               <>
