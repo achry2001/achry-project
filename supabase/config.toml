@@ -1,1 +1,5 @@
+
 project_id = "afmoxhllsyiqkhxhyxsk"
+
+[functions.scrape-dates]
+verify_jwt = false
