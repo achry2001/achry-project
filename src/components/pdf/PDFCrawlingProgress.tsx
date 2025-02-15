@@ -33,10 +33,13 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
   const { data: journalSources, isLoading: isLoadingSources } = useQuery({
     queryKey: ['journalSources'],
     queryFn: async () => {
+      console.log("Fetching journal sources...");
       const { data, error } = await supabase
         .from('journal_sources')
         .select('*')
         .order('name', { ascending: true });
+      
+      console.log("Fetch result:", { data, error });
       
       if (error) {
         toast({
@@ -52,6 +55,7 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
   });
 
   const handleSourceChange = (value: string) => {
+    console.log("Source selected:", value);
     setSelectedSource(value);
   };
 
@@ -93,6 +97,19 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
     }
   };
 
+  const handleCrawlClick = () => {
+    if (!selectedSource) {
+      toast({
+        title: "Error",
+        description: "Please select a date first",
+        variant: "destructive",
+      });
+      return;
+    }
+    console.log("Starting crawl with source:", selectedSource);
+    onStartCrawling();
+  };
+
   return (
     <>
       <div className="flex justify-between items-center mb-8">
@@ -123,7 +140,7 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
           </button>
 
           <button
-            onClick={onStartCrawling}
+            onClick={handleCrawlClick}
             className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 ${
               isCrawling ? 'opacity-50 cursor-not-allowed' : ''
             }`}
