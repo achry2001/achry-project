@@ -7,16 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-
-interface JournalSource {
-  id: number;
-  name: string;
-  value: string;
-}
 
 interface PDFCrawlingProgressProps {
   isCrawling: boolean;
@@ -25,36 +15,6 @@ interface PDFCrawlingProgressProps {
 }
 
 export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: PDFCrawlingProgressProps) => {
-  const { toast } = useToast();
-  const [selectedSource, setSelectedSource] = useState<string>("");
-
-  const { data: journalSources, isLoading: isLoadingSources } = useQuery({
-    queryKey: ['journalSources'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('journal_sources')
-        .select('*')
-        .order('name', { ascending: true });
-      
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load journal sources",
-          variant: "destructive",
-        });
-        throw error;
-      }
-
-      console.log("Loaded journal sources:", data); // Debug log
-      return data as JournalSource[];
-    }
-  });
-
-  const handleSourceChange = (value: string) => {
-    console.log("Selected source:", value); // Debug log
-    setSelectedSource(value);
-  };
-
   return (
     <>
       <div className="flex justify-between items-center mb-8">
@@ -62,16 +22,12 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
           Egypt Gazette Extraction
         </h2>
         <div className="flex gap-4 items-center">
-          <Select value={selectedSource} onValueChange={handleSourceChange}>
+          <Select>
             <SelectTrigger className="w-[180px] border-blue-200">
-              <SelectValue placeholder={isLoadingSources ? "Loading..." : "Select source"} />
+              <SelectValue placeholder="Select source" />
             </SelectTrigger>
             <SelectContent>
-              {journalSources?.map((source) => (
-                <SelectItem key={source.id} value={source.value}>
-                  {source.name}
-                </SelectItem>
-              ))}
+              {/* Values will be populated later */}
             </SelectContent>
           </Select>
           <button
@@ -79,7 +35,7 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
             className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 ${
               isCrawling ? 'opacity-50 cursor-not-allowed' : ''
             }`}
-            disabled={isCrawling || !selectedSource}
+            disabled={isCrawling}
           >
             {isCrawling ? (
               <>
