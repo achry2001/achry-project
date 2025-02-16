@@ -1,6 +1,6 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import puppeteer from 'https://deno.land/x/puppeteer@16.2.0/mod.ts';
+import { chromium } from 'https://deno.land/x/playwright@0.5.0/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,22 +19,23 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Launch Puppeteer browser
-    const browser = await puppeteer.launch({ 
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    // Launch browser
+    const browser = await chromium.launch({
+      headless: true
     });
-    const page = await browser.newPage();
+    
+    const context = await browser.newContext();
+    const page = await context.newPage();
     
     // Navigate to the target page
-    await page.goto('http://www.itda.gov.eg/jurnal-sgl.aspx', { waitUntil: 'networkidle2' });
-
+    await page.goto('http://www.itda.gov.eg/jurnal-sgl.aspx');
+    
     // Wait for dropdown and extract options
     const dropdownValues = await page.evaluate(() => {
       const dropdown = document.querySelector('#DropDownList1');
       if (!dropdown) return [];
       
-      return Array.from(dropdown.options).map(option => ({
+      return Array.from(dropdown.querySelectorAll('option')).map(option => ({
         name: option.textContent.trim(),
         value: option.value
       }));
