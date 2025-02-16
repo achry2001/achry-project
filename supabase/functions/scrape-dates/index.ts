@@ -51,15 +51,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Sort the values by date (assuming the value contains a date in YYYY-MM format)
-    dropdownValues.sort((a, b) => {
-      // Extract dates from values (assuming format like "2024-03")
-      const dateA = a.value.split('-').slice(0, 2).join('-');
-      const dateB = b.value.split('-').slice(0, 2).join('-');
-      return dateB.localeCompare(dateA); // Sort in descending order (most recent first)
-    });
-
-    console.log('Scraped and sorted values:', dropdownValues);
+    console.log('Scraped values:', dropdownValues);
 
     // Validate scraped data
     if (!dropdownValues.length) {
