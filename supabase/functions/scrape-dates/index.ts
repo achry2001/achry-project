@@ -1,6 +1,5 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { chromium } from 'https://deno.land/x/playwright@0.5.0/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,31 +18,30 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Launch browser
-    const browser = await chromium.launch({
-      headless: true
-    });
+    console.log('Fetching webpage...');
     
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    
-    // Navigate to the target page
-    await page.goto('http://www.itda.gov.eg/jurnal-sgl.aspx');
-    
-    // Wait for dropdown and extract options
-    const dropdownValues = await page.evaluate(() => {
-      const dropdown = document.querySelector('#DropDownList1');
-      if (!dropdown) return [];
-      
-      return Array.from(dropdown.querySelectorAll('option')).map(option => ({
-        name: option.textContent.trim(),
-        value: option.value
-      }));
-    });
+    // Fetch the webpage content
+    const response = await fetch('http://www.itda.gov.eg/jurnal-sgl.aspx');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const html = await response.text();
+
+    // Extract dropdown values using regex
+    const regex = /<option[^>]*value="([^"]*)"[^>]*>(.*?)<\/option>/g;
+    const dropdownValues = [];
+    let match;
+
+    while ((match = regex.exec(html)) !== null) {
+      if (match[1] && match[2]) {
+        dropdownValues.push({
+          name: match[2].trim(),
+          value: match[1].trim()
+        });
+      }
+    }
 
     console.log('Scraped values:', dropdownValues);
-
-    await browser.close();
 
     // Validate scraped data
     if (!dropdownValues.length) {
