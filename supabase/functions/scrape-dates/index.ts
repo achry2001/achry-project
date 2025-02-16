@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import * as cheerio from 'https://esm.sh/cheerio@1.0.0'; // HTML parser
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,38 +23,34 @@ Deno.serve(async (req) => {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const html = await response.text();
 
-    // Fixed regex pattern to find dropdown
-    const selectMatch = html.match(/<select[^>]*id="DropDownList1"[^>]*>([\s\S]*?)<\/select>/i);
-    if (!selectMatch) throw new Error('Dropdown container not found');
-
-    // Extract options with value/text
-    const options = [];
-    const optionRegex = /<option\s+value="(\d+)"[^>]*>([^<]+)<\/option>/gi;
-    let match;
+    // Load HTML into Cheerio
+    const $ = cheerio.load(html);
     
-    while ((match = optionRegex.exec(selectMatch[0])) !== null) {
-      options.push({
-        value: match[1],  // The numeric value (e.g., "881")
-        name: match[2].trim()  // The Arabic text (e.g., "ديسمبر - 2024")
-      });
-    }
+    // Find the dropdown and its options
+    const dropdown = $('#DropDownList1');
+    if (!dropdown.length) throw new Error('Dropdown not found');
 
-    if (!options.length) throw new Error('No options found in dropdown');
+    // Extract options with original order
+    const options = [];
+    dropdown.find('option').each((index, element) => {
+      options.push({
+        value: $(element).attr('value'),
+        name: $(element).text().trim(),
+        original_order: index // Preserve original position
+      });
+    });
+
+    if (!options.length) throw new Error('No options found');
 
     // Clear existing data
-    const { error: deleteError } = await supabaseClient
-      .from('journal_sources')
-      .delete()
-      .neq('id', 0);
-
-    if (deleteError) throw deleteError;
+    await supabaseClient.from('journal_sources').delete().neq('id', 0);
 
     // Insert new data
-    const { error: insertError } = await supabaseClient
+    const { error } = await supabaseClient
       .from('journal_sources')
       .insert(options);
 
-    if (insertError) throw insertError;
+    if (error) throw error;
 
     return new Response(
       JSON.stringify({ success: true, count: options.length }),
