@@ -1,4 +1,3 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
@@ -24,7 +23,7 @@ Deno.serve(async (req) => {
     const { error: deleteError } = await supabaseClient
       .from('journal_sources')
       .delete()
-      .neq('id', 0); // This will delete all entries
+      .neq('id', 0);
     
     if (deleteError) {
       console.error("Error deleting existing entries:", deleteError);
@@ -37,12 +36,20 @@ Deno.serve(async (req) => {
     }
     const html = await response.text();
 
-    // Extract dropdown values using regex
-    const regex = /<option[^>]*value="([^"]*)"[^>]*>(.*?)<\/option>/g;
+    // First find the specific dropdown container
+    const selectRegex = /<select\s+id="DropDownList1"[^>]*>([\s\S]*?)<\/select>/i;
+    const selectMatch = html.match(selectRegex);
+    
+    if (!selectMatch) {
+      throw new Error('Target dropdown not found in HTML');
+    }
+
+    // Now extract options from the dropdown content
+    const optionRegex = /<option\s+value="([^"]*)"[^>]*>(.*?)<\/option>/gi;
     const dropdownValues = [];
     let match;
-
-    while ((match = regex.exec(html)) !== null) {
+    
+    while ((match = optionRegex.exec(selectMatch[1])) !== null) {
       if (match[1] && match[2]) {
         dropdownValues.push({
           name: match[2].trim(),
@@ -60,7 +67,7 @@ Deno.serve(async (req) => {
 
     console.log("Inserting scraped dates...");
 
-    // Store values in Supabase
+    // Store values in Supabase in original order
     for (const date of dropdownValues) {
       const { error } = await supabaseClient
         .from('journal_sources')
