@@ -20,6 +20,16 @@ Deno.serve(async (req) => {
 
     console.log('Fetching webpage...');
     
+    // First, delete all existing entries
+    const { error: deleteError } = await supabaseClient
+      .from('journal_sources')
+      .delete()
+      .neq('id', 0); // This will delete all entries
+    
+    if (deleteError) {
+      console.error("Error deleting existing entries:", deleteError);
+    }
+
     // Fetch the webpage content
     const response = await fetch('http://www.itda.gov.eg/jurnal-sgl.aspx');
     if (!response.ok) {
@@ -41,7 +51,15 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log('Scraped values:', dropdownValues);
+    // Sort the values by date (assuming the value contains a date in YYYY-MM format)
+    dropdownValues.sort((a, b) => {
+      // Extract dates from values (assuming format like "2024-03")
+      const dateA = a.value.split('-').slice(0, 2).join('-');
+      const dateB = b.value.split('-').slice(0, 2).join('-');
+      return dateB.localeCompare(dateA); // Sort in descending order (most recent first)
+    });
+
+    console.log('Scraped and sorted values:', dropdownValues);
 
     // Validate scraped data
     if (!dropdownValues.length) {
