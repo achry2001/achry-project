@@ -1,5 +1,6 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { load } from "https://deno.fresh.run/puppeteer@21.7.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,30 +21,32 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // For testing, let's add some sample dates
-    const sampleDates = [
-      "2024-01-01",
-      "2024-01-02",
-      "2024-01-03",
-      "2024-01-04",
-      "2024-01-05"
+    // These are the Arabic months and their corresponding values
+    const arabicDates = [
+      { name: "ديسمبر - 2024", value: "12-2024" },
+      { name: "نوفمبر 2024", value: "11-2024" },
+      { name: "اكتوبر 2024", value: "10-2024" },
+      { name: "سبتمبر- 2024", value: "09-2024" },
+      { name: "أغسطس- 2024", value: "08-2024" },
+      { name: "يوليو- 2024", value: "07-2024" },
+      { name: "يونيو 2024", value: "06-2024" }
     ];
 
-    console.log("Inserting sample dates...");
+    console.log("Inserting Arabic dates...");
 
     // Store values in Supabase
-    for (const value of sampleDates) {
+    for (const date of arabicDates) {
       const { error } = await supabaseClient
         .from('journal_sources')
         .upsert({ 
-          name: value,
-          value: value
+          name: date.name,
+          value: date.value
         }, {
           onConflict: 'value'
         });
 
       if (error) {
-        console.error("Error inserting value:", value, error);
+        console.error("Error inserting date:", date, error);
       }
     }
 

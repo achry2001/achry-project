@@ -27,7 +27,6 @@ interface PDFCrawlingProgressProps {
 export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: PDFCrawlingProgressProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedSource, setSelectedSource] = useState<string>("");
   const [isScrapingDates, setIsScrapingDates] = useState(false);
 
   const { data: journalSources, isLoading: isLoadingSources } = useQuery({
@@ -53,11 +52,6 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
       return data as JournalSource[];
     }
   });
-
-  const handleSourceChange = (value: string) => {
-    console.log("Source selected:", value);
-    setSelectedSource(value);
-  };
 
   const refreshDates = async () => {
     try {
@@ -97,27 +91,11 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
     }
   };
 
-  const handleCrawlClick = () => {
-    if (!selectedSource) {
-      toast({
-        title: "Error",
-        description: "Please select a date first",
-        variant: "destructive",
-      });
-      return;
-    }
-    console.log("Starting crawl with source:", selectedSource);
-    onStartCrawling();
-  };
-
   return (
     <>
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-xl font-semibold text-blue-900">
-          Egypt Gazette Extraction
-        </h2>
+      <div className="flex items-center gap-4 mb-8">
         <div className="flex gap-4 items-center">
-          <Select value={selectedSource} onValueChange={handleSourceChange}>
+          <Select>
             <SelectTrigger className="w-[180px] border-blue-200">
               <SelectValue placeholder={isLoadingSources ? "Loading..." : "Select date"} />
             </SelectTrigger>
@@ -138,13 +116,15 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
           >
             <RefreshCw className={`h-4 w-4 text-gray-600 ${isScrapingDates ? 'animate-spin' : ''}`} />
           </button>
+        </div>
 
+        <div className="flex-1 flex justify-end">
           <button
-            onClick={handleCrawlClick}
+            onClick={onStartCrawling}
             className={`inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 ${
               isCrawling ? 'opacity-50 cursor-not-allowed' : ''
             }`}
-            disabled={isCrawling || !selectedSource}
+            disabled={isCrawling}
           >
             {isCrawling ? (
               <>
