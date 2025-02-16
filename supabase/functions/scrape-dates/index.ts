@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import puppeteer from 'https://deno.land/x/puppeteer@16.2.0/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,82 +12,70 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  let browser;
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('Fetching webpage...');
+    // Configure Puppeteer with browser-like headers
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage'
+      ]
+    });
     
-    // First, delete all existing entries
+    const page = await browser.newPage();
+    
+    // Set user agent to mimic Chrome browser
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    
+    // Navigate with longer timeout
+    await page.goto('http://www.itda.gov.eg/jurnal-sgl.aspx', {
+      waitUntil: 'networkidle2',
+      timeout: 60000
+    });
+
+    // Wait for dropdown to exist in DOM
+    await page.waitForSelector('#DropDownList1', { timeout: 15000 });
+
+    // Extract options with proper ordering
+    const dropdownValues = await page.evaluate(() => {
+      const select = document.getElementById('DropDownList1');
+      return Array.from(select.options).map(option => ({
+        name: option.textContent.trim(),
+        value: option.value.trim()
+      }));
+    });
+
+    console.log('Scraped values:', dropdownValues);
+
+    if (!dropdownValues.length) {
+      throw new Error('No dropdown values found after rendering');
+    }
+
+    // Delete existing entries
     const { error: deleteError } = await supabaseClient
       .from('journal_sources')
       .delete()
       .neq('id', 0);
-    
-    if (deleteError) {
-      console.error("Error deleting existing entries:", deleteError);
-    }
 
-    // Fetch the webpage content
-    const response = await fetch('http://www.itda.gov.eg/jurnal-sgl.aspx');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const html = await response.text();
+    if (deleteError) throw deleteError;
 
-    // First find the specific dropdown container
-    const selectRegex = /<select\s+id="DropDownList1"[^>]*>([\s\S]*?)<\/select>/i;
-    const selectMatch = html.match(selectRegex);
-    
-    if (!selectMatch) {
-      throw new Error('Target dropdown not found in HTML');
-    }
+    // Batch insert for better performance
+    const { error: insertError } = await supabaseClient
+      .from('journal_sources')
+      .insert(dropdownValues);
 
-    // Now extract options from the dropdown content
-    const optionRegex = /<option\s+value="([^"]*)"[^>]*>(.*?)<\/option>/gi;
-    const dropdownValues = [];
-    let match;
-    
-    while ((match = optionRegex.exec(selectMatch[1])) !== null) {
-      if (match[1] && match[2]) {
-        dropdownValues.push({
-          name: match[2].trim(),
-          value: match[1].trim()
-        });
-      }
-    }
-
-    console.log('Scraped values:', dropdownValues);
-
-    // Validate scraped data
-    if (!dropdownValues.length) {
-      throw new Error('No dropdown values found');
-    }
-
-    console.log("Inserting scraped dates...");
-
-    // Store values in Supabase in original order
-    for (const date of dropdownValues) {
-      const { error } = await supabaseClient
-        .from('journal_sources')
-        .upsert({ 
-          name: date.name,
-          value: date.value
-        }, {
-          onConflict: 'value'
-        });
-
-      if (error) {
-        console.error("Error inserting date:", date, error);
-      }
-    }
+    if (insertError) throw insertError;
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Dates updated successfully",
         count: dropdownValues.length 
       }),
       { 
@@ -96,16 +85,19 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Full error:", error);
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        success: false 
+        success: false,
+        debug: "Ensure Puppeteer dependencies are installed in your environment"
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 
       }
     );
+  } finally {
+    if (browser) await browser.close();
   }
 });
