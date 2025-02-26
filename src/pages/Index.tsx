@@ -7,20 +7,17 @@ const Index = () => {
   const [currentSection, setCurrentSection] = useState("egypt-gazette");
 
   return (
-    <div className="min-h-screen bg-gray-600">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gray-600">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
         <div className="max-w-7xl mx-auto px-8 py-4">
           <div className="flex justify-between items-center">
             <img 
               src="/lovable-uploads/3bff204d-b72f-4749-8064-f99ff167bc7e.png" 
               alt="Cedar Rose Logo" 
-              className="h-16 w-auto object-contain mix-blend-normal filter-none"
+              className="h-16 w-auto object-contain mix-blend-normal"
             />
           </div>
         </div>
-      </div>
-      
-      <div className="fixed top-[88px] left-0 right-0 z-40 bg-gray-600 border-t border-gray-500">
         <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
       </div>
       
