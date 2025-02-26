@@ -16,6 +16,7 @@ interface JournalSource {
   id: number;
   name: string;
   value: string;
+  original_order: number;
 }
 
 interface PDFCrawlingProgressProps {
@@ -36,7 +37,7 @@ export const PDFCrawlingProgress = ({ isCrawling, progress, onStartCrawling }: P
       const { data, error } = await supabase
         .from('journal_sources')
         .select('*')
-        .order('name', { ascending: true });
+        .order('original_order', { ascending: true });
       
       console.log("Fetch result:", { data, error });
       

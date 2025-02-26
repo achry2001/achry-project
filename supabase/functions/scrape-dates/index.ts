@@ -1,5 +1,5 @@
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import * as cheerio from 'https://esm.sh/cheerio@1.0.0'; // HTML parser
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,49 +18,89 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Fetch webpage
+    console.log('Fetching webpage...');
+    
+    // First, delete all existing entries
+    const { error: deleteError } = await supabaseClient
+      .from('journal_sources')
+      .delete()
+      .neq('id', 0); // This will delete all entries
+    
+    if (deleteError) {
+      console.error("Error deleting existing entries:", deleteError);
+    }
+
+    // Fetch the webpage content
     const response = await fetch('http://www.itda.gov.eg/jurnal-sgl.aspx');
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const html = await response.text();
 
-    // Load HTML into Cheerio
-    const $ = cheerio.load(html);
-    
-    // Find the dropdown and its options
-    const dropdown = $('#DropDownList1');
-    if (!dropdown.length) throw new Error('Dropdown not found');
+    // Extract dropdown values using regex
+    const regex = /<option[^>]*value="([^"]*)"[^>]*>(.*?)<\/option>/g;
+    const dropdownValues = [];
+    let order = 0;
 
-    // Extract options with original order
-    const options = [];
-    dropdown.find('option').each((index, element) => {
-      options.push({
-        value: $(element).attr('value'),
-        name: $(element).text().trim(),
-        original_order: index // Preserve original position
-      });
-    });
+    while ((match = regex.exec(html)) !== null) {
+      if (match[1] && match[2]) {
+        dropdownValues.push({
+          name: match[2].trim(),
+          value: match[1].trim(),
+          original_order: order++
+        });
+      }
+    }
 
-    if (!options.length) throw new Error('No options found');
+    console.log('Scraped values:', dropdownValues);
 
-    // Clear existing data
-    await supabaseClient.from('journal_sources').delete().neq('id', 0);
+    // Validate scraped data
+    if (!dropdownValues.length) {
+      throw new Error('No dropdown values found');
+    }
 
-    // Insert new data
-    const { error } = await supabaseClient
-      .from('journal_sources')
-      .insert(options);
+    console.log("Inserting scraped dates...");
 
-    if (error) throw error;
+    // Store values in Supabase with original order
+    for (const date of dropdownValues) {
+      const { error } = await supabaseClient
+        .from('journal_sources')
+        .upsert({ 
+          name: date.name,
+          value: date.value,
+          original_order: date.original_order
+        }, {
+          onConflict: 'value'
+        });
+
+      if (error) {
+        console.error("Error inserting date:", date, error);
+      }
+    }
 
     return new Response(
-      JSON.stringify({ success: true, count: options.length }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      JSON.stringify({ 
+        success: true, 
+        message: "Dates updated successfully",
+        count: dropdownValues.length 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      }
     );
 
   } catch (error) {
+    console.error("Error:", error);
     return new Response(
-      JSON.stringify({ error: error.message, success: false }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ 
+        error: error.message,
+        success: false 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500 
+      }
     );
   }
 });
