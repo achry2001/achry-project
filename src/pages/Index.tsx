@@ -8,19 +8,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="max-w-7xl mx-auto px-8 py-4">
-        <div className="flex justify-between items-center mb-6">
-          <img 
-            src="/lovable-uploads/3bff204d-b72f-4749-8064-f99ff167bc7e.png" 
-            alt="Cedar Rose Logo" 
-            className="h-16 object-contain"
-          />
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
+        <div className="max-w-7xl mx-auto px-8 py-4">
+          <div className="flex justify-between items-center">
+            <img 
+              src="/lovable-uploads/3bff204d-b72f-4749-8064-f99ff167bc7e.png" 
+              alt="Cedar Rose Logo" 
+              className="h-16 w-auto object-contain mix-blend-normal"
+            />
+          </div>
         </div>
+        <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
       </div>
       
-      <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
-      
-      <main className="max-w-7xl mx-auto mt-8 px-8 py-6">
+      <main className="max-w-7xl mx-auto px-8 py-6 mt-40">
         <PDFManagementContainer />
       </main>
     </div>
