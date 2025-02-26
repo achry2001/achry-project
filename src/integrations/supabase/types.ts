@@ -14,6 +14,7 @@ export type Database = {
           created_at: string
           id: number
           name: string
+          original_order: number | null
           updated_at: string
           value: string
         }
@@ -21,6 +22,7 @@ export type Database = {
           created_at?: string
           id?: number
           name: string
+          original_order?: number | null
           updated_at?: string
           value: string
         }
@@ -28,6 +30,7 @@ export type Database = {
           created_at?: string
           id?: number
           name?: string
+          original_order?: number | null
           updated_at?: string
           value?: string
         }
