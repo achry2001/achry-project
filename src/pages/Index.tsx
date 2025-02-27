@@ -8,13 +8,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-8 py-4">
           <div className="flex justify-between items-center">
             <img 
               src="/lovable-uploads/3bff204d-b72f-4749-8064-f99ff167bc7e.png" 
               alt="Cedar Rose Logo" 
-              className="h-16 w-auto object-contain mix-blend-normal"
+              className="h-16 w-auto object-contain"
+              style={{ filter: 'none', opacity: 1 }}
             />
           </div>
         </div>
