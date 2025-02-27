@@ -8,8 +8,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Simple header with no nested containers */}
-      <header className="w-full bg-white border-b border-gray-200">
+      {/* Logo section - separate from PDFHeader */}
+      <div className="w-full bg-white border-b border-gray-200 fixed top-0 z-50">
         <div className="max-w-7xl mx-auto px-8 py-4 flex items-center">
           <img 
             src="/lovable-uploads/52d79a61-b2e9-41e6-a784-fe6cb8bf51bf.png" 
@@ -17,12 +17,12 @@ const Index = () => {
             className="h-16 mr-4"
           />
         </div>
-        <div className="w-full">
-          <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
-        </div>
-      </header>
+      </div>
       
-      <main className="max-w-7xl mx-auto px-8 py-6 mt-24">
+      {/* PDFHeader is now a separate fixed element */}
+      <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
+      
+      <main className="max-w-7xl mx-auto px-8 py-6 mt-40">
         <PDFManagementContainer />
       </main>
     </div>
