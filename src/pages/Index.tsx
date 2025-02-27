@@ -8,21 +8,22 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Logo section - separate from PDFHeader */}
-      <div className="w-full bg-white border-b border-gray-200 fixed top-0 z-50">
+      {/* Completely redesigned header section */}
+      <header className="w-full bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-8 py-4 flex items-center">
           <img 
-            src="/lovable-uploads/52d79a61-b2e9-41e6-a784-fe6cb8bf51bf.png" 
+            src="/lovable-uploads/2a28368a-88a9-4d27-8e3d-cc1cb9430228.png" 
             alt="Cedar Rose Logo" 
             className="h-16 mr-4"
           />
+          <h1 className="text-2xl font-bold text-blue-800">Cedar Rose Data Operations</h1>
         </div>
-      </div>
+        <div className="w-full">
+          <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
+        </div>
+      </header>
       
-      {/* PDFHeader is now a separate fixed element */}
-      <PDFHeader currentSection={currentSection} onSectionChange={setCurrentSection} />
-      
-      <main className="max-w-7xl mx-auto px-8 py-6 mt-40">
+      <main className="max-w-7xl mx-auto px-8 py-6 mt-24">
         <PDFManagementContainer />
       </main>
     </div>
