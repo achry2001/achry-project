@@ -61,14 +61,3 @@
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
-
-/* Remove any backdrop blur */
-* {
-  backdrop-filter: none !important;
-}
-
-/* Ensure images are rendered at highest quality */
-img {
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-}
