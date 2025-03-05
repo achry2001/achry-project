@@ -22,7 +22,7 @@ const sections = {
 
 export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection: string; onSectionChange: (section: string) => void }) => {
   return (
-    <header className="w-full py-4 px-8 border-b border-gray-200 bg-white fixed top-0 z-50 shadow-sm">
+    <header className="w-full py-4 px-8 border-b border-gray-200 bg-white fixed top-16 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-blue-800">Cedar Rose Data Operations</h1>
         
