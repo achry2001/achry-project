@@ -24,7 +24,14 @@ export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection:
   return (
     <header className="w-full py-4 px-8 border-b border-gray-200 bg-white fixed top-16 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-blue-800">Cedar Rose Data Operations</h1>
+        <div className="flex items-center">
+          <img 
+            src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
+            alt="Cedar Rose Logo" 
+            className="h-8 w-auto mr-3"
+          />
+          <h1 className="text-2xl font-semibold text-blue-800">Cedar Rose Data Operations</h1>
+        </div>
         
         <div className="flex items-center space-x-6">
           <div className="relative">
