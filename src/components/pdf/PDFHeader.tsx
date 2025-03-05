@@ -6,6 +6,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import { Search, Bell } from "lucide-react";
 
 const sections = {
   gazette: [
@@ -20,50 +22,69 @@ const sections = {
 
 export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection: string; onSectionChange: (section: string) => void }) => {
   return (
-    <header className="w-full py-6 px-8 border-b border-blue-100 bg-white fixed top-0 z-50">
+    <header className="w-full py-4 px-8 border-b border-gray-200 bg-white fixed top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-blue-900">Cedar Rose Data Operations</h1>
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-blue-900">Gazette Extraction</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="grid gap-3 p-4 w-[200px]">
-                  {sections.gazette.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => onSectionChange(item.id)}
-                      className={`text-left px-2 py-1 rounded hover:bg-blue-50 ${
-                        currentSection === item.id ? 'bg-blue-50 text-blue-900' : 'text-gray-700'
-                      }`}
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
+        <h1 className="text-2xl font-semibold text-blue-800">Cedar Rose Data Operations</h1>
+        
+        <div className="flex items-center space-x-6">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-4 w-4 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="py-2 pl-10 pr-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+            />
+          </div>
+          
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-blue-700 font-medium hover:bg-blue-50">Gazette Extraction</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-4 w-[240px] bg-white rounded-md shadow-lg">
+                    {sections.gazette.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => onSectionChange(item.id)}
+                        className={`text-left px-3 py-2 rounded-md transition-colors duration-200 ${
+                          currentSection === item.id ? 'bg-blue-100 text-blue-800 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
 
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-blue-900">Mapping</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="grid gap-3 p-4 w-[200px]">
-                  {sections.mapping.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => onSectionChange(item.id)}
-                      className={`text-left px-2 py-1 rounded hover:bg-blue-50 ${
-                        currentSection === item.id ? 'bg-blue-50 text-blue-900' : 'text-gray-700'
-                      }`}
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-blue-700 font-medium hover:bg-blue-50">Mapping</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-4 w-[240px] bg-white rounded-md shadow-lg">
+                    {sections.mapping.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => onSectionChange(item.id)}
+                        className={`text-left px-3 py-2 rounded-md transition-colors duration-200 ${
+                          currentSection === item.id ? 'bg-blue-100 text-blue-800 font-medium' : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+          
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5 text-gray-600" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+          </Button>
+        </div>
       </div>
     </header>
   );
