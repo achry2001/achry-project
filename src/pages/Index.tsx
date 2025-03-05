@@ -11,7 +11,7 @@ const Index = () => {
       <div className="fixed top-0 left-0 right-0 z-50 bg-white">
         <div className="max-w-7xl mx-auto px-8 py-3 flex items-center">
           <img 
-            src="/lovable-uploads/3bff204d-b72f-4749-8064-f99ff167bc7e.png" 
+            src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
             alt="Cedar Rose Logo" 
             className="h-12 w-auto"
           />
