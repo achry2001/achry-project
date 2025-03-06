@@ -7,7 +7,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { Search, Bell } from "lucide-react";
+import { Bell } from "lucide-react";
 
 const sections = {
   gazette: [
@@ -34,17 +34,6 @@ export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection:
         </div>
         
         <div className="flex items-center space-x-6">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="py-2 pl-10 pr-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
-            />
-          </div>
-          
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
