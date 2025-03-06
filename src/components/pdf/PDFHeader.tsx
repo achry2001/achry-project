@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
+import { AuthButton } from "@/components/AuthButton";
 
 const sections = {
   gazette: [
@@ -80,6 +81,8 @@ export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection:
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
           </Button>
+          
+          <AuthButton />
         </div>
       </div>
     </header>
