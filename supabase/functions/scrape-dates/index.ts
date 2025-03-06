@@ -41,7 +41,9 @@ Deno.serve(async (req) => {
     const regex = /<option[^>]*value="([^"]*)"[^>]*>(.*?)<\/option>/g;
     const dropdownValues = [];
     let order = 0;
-
+    
+    // Declare match variable before using it in the loop
+    let match;
     while ((match = regex.exec(html)) !== null) {
       if (match[1] && match[2]) {
         dropdownValues.push({
