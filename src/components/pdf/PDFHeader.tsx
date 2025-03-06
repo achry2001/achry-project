@@ -28,7 +28,7 @@ export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection:
           <img 
             src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
             alt="Cedar Rose Logo" 
-            className="h-8 w-auto mr-3"
+            className="h-10 w-auto mr-3"
           />
           <h1 className="text-2xl font-semibold text-blue-800">Cedar Rose Data Operations</h1>
         </div>
