@@ -64,15 +64,15 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-white">
       {/* Left side - Authentication Form */}
-      <div className="w-1/2 flex items-center justify-center bg-white px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-1/2 flex items-start justify-start bg-white p-12">
         <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
+          <div>
             <img 
               src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
               alt="Cedar Rose Logo" 
-              className="mx-auto h-14 w-auto"
+              className="h-14 w-auto"
             />
             <h2 className="mt-6 text-3xl font-bold tracking-tight text-blue-800">
               {view === "sign-in" ? "Sign in to your account" : 
@@ -179,11 +179,11 @@ const Auth = () => {
       </div>
       
       {/* Right side - Image */}
-      <div className="w-1/2 hidden md:flex md:items-center md:justify-center bg-blue-900">
+      <div className="w-1/2 hidden md:flex md:items-center md:justify-center bg-white">
         <img 
           src="/lovable-uploads/afa682ab-3c12-4f4d-9952-37e1f459104e.png" 
           alt="Cedar Rose AI" 
-          className="object-contain"
+          className="object-contain w-[90%]"
         />
       </div>
     </div>
