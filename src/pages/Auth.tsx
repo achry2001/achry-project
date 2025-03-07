@@ -179,18 +179,12 @@ const Auth = () => {
       </div>
       
       {/* Right side - Image */}
-      <div className="w-1/2 hidden md:block relative bg-blue-900">
+      <div className="w-1/2 hidden md:flex md:items-center md:justify-center bg-blue-900">
         <img 
           src="/lovable-uploads/afa682ab-3c12-4f4d-9952-37e1f459104e.png" 
           alt="Cedar Rose AI" 
-          className="absolute inset-0 w-full h-full object-cover"
+          className="object-contain"
         />
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/80 to-transparent flex flex-col items-center justify-center text-white p-12">
-          <h2 className="text-4xl font-bold mb-4">Cedar Rose AI</h2>
-          <p className="text-xl max-w-md text-center">
-            Empowering organizations with advanced AI solutions for data analysis and intelligence.
-          </p>
-        </div>
       </div>
     </div>
   );
