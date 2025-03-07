@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { Circleinfo } from "lucide-react";
+import { CircleInfo } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
