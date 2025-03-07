@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { CircleInfo } from "lucide-react";
+import { InfoCircle } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -98,7 +98,7 @@ const Auth = () => {
           
           <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
             <div className="flex gap-2">
-              <CircleInfo className="text-blue-700 h-5 w-5 mt-0.5" />
+              <InfoCircle className="text-blue-700 h-5 w-5 mt-0.5" />
               <div>
                 <p className="text-sm text-blue-700">Only employees with verified company email addresses can access the app.</p>
                 <p className="text-xs mt-1 text-blue-600">Contact your administrator if you need an account.</p>
