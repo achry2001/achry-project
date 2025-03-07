@@ -1,10 +1,11 @@
 
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -13,10 +14,10 @@ const Auth = () => {
   const [view, setView] = useState<"sign-in" | "sign-up" | "forgot-password">("sign-in");
   const navigate = useNavigate();
   
-  const session = supabase.auth.getSession();
+  const { user } = useAuth();
 
   // If user is already logged in, redirect to home page
-  if (session) {
+  if (user) {
     return <Navigate to="/" />;
   }
 
