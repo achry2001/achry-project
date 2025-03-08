@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { InfoCircle } from "lucide-react";
+import { Info } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -31,12 +31,29 @@ const Auth = () => {
       if (view === "sign-in") {
         // Special case for admin login
         if (email === "admin@admin" && password === "admin") {
-          const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
+          // For admin login, we'll create a custom session
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: "admin@admin.com", // Using valid email format for Supabase
+            password: "admin",
           });
           
-          if (error) throw error;
+          if (error) {
+            // If login fails, try to sign up the admin account first
+            const { error: signUpError } = await supabase.auth.signUp({
+              email: "admin@admin.com",
+              password: "admin",
+            });
+            
+            if (signUpError) throw signUpError;
+            
+            // Try login again after signup
+            const { error: retryError } = await supabase.auth.signInWithPassword({
+              email: "admin@admin.com",
+              password: "admin",
+            });
+            
+            if (retryError) throw retryError;
+          }
           
           toast.success("Admin signed in successfully!");
           navigate("/");
@@ -98,7 +115,7 @@ const Auth = () => {
           
           <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
             <div className="flex gap-2">
-              <InfoCircle className="text-blue-700 h-5 w-5 mt-0.5" />
+              <Info className="text-blue-700 h-5 w-5 mt-0.5" />
               <div>
                 <p className="text-sm text-blue-700">Only employees with verified company email addresses can access the app.</p>
                 <p className="text-xs mt-1 text-blue-600">Contact your administrator if you need an account.</p>
