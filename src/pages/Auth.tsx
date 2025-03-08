@@ -30,18 +30,18 @@ const Auth = () => {
     try {
       if (view === "sign-in") {
         // Special case for admin login
-        if (email === "admin@admin" && password === "admin") {
+        if (email === "admin@admin" && password === "admin123") {
           // For admin login, we'll create a custom session
           const { data, error } = await supabase.auth.signInWithPassword({
             email: "admin@admin.com", // Using valid email format for Supabase
-            password: "admin",
+            password: "admin123",
           });
           
           if (error) {
             // If login fails, try to sign up the admin account first
             const { error: signUpError } = await supabase.auth.signUp({
               email: "admin@admin.com",
-              password: "admin",
+              password: "admin123",
             });
             
             if (signUpError) throw signUpError;
@@ -49,7 +49,7 @@ const Auth = () => {
             // Try login again after signup
             const { error: retryError } = await supabase.auth.signInWithPassword({
               email: "admin@admin.com",
-              password: "admin",
+              password: "admin123",
             });
             
             if (retryError) throw retryError;
