@@ -33,14 +33,14 @@ const Auth = () => {
         if (email === "admin@admin" && password === "admin123") {
           // For admin login, we'll create a custom session
           const { data, error } = await supabase.auth.signInWithPassword({
-            email: "admin@admin.com", // Using valid email format for Supabase
+            email: "achrefmsd5@gmail.com", // Updated email for Supabase
             password: "admin123",
           });
           
           if (error) {
             // If login fails, try to sign up the admin account first
             const { error: signUpError } = await supabase.auth.signUp({
-              email: "admin@admin.com",
+              email: "achrefmsd5@gmail.com",
               password: "admin123",
             });
             
@@ -48,7 +48,7 @@ const Auth = () => {
             
             // Try login again after signup
             const { error: retryError } = await supabase.auth.signInWithPassword({
-              email: "admin@admin.com",
+              email: "achrefmsd5@gmail.com",
               password: "admin123",
             });
             
