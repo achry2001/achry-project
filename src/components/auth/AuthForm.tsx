@@ -28,26 +28,28 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
         if (email === "admin@admin" && password === "admin123") {
           // For admin login, we'll create a custom session
           const { data, error } = await supabase.auth.signInWithPassword({
-            email: "achrefmsd5@gmail.com", // Updated email for Supabase
+            email: "achrefmsd5@gmail.com", // Use this email for Supabase
             password: "admin123",
           });
           
           if (error) {
-            // If login fails, try to sign up the admin account first
-            const { error: signUpError } = await supabase.auth.signUp({
-              email: "achrefmsd5@gmail.com",
-              password: "admin123",
-            });
+            // If there's an error, check if it's due to email confirmation
+            if (error.message.includes("Email not confirmed")) {
+              // Try to sign up again (in case the user hasn't been created)
+              const { error: signUpError } = await supabase.auth.signUp({
+                email: "achrefmsd5@gmail.com",
+                password: "admin123",
+              });
+              
+              if (!signUpError) {
+                toast.info("We've sent a confirmation email. Please check your inbox and confirm your email.");
+                setLoading(false);
+                return;
+              }
+            }
             
-            if (signUpError) throw signUpError;
-            
-            // Try login again after signup
-            const { error: retryError } = await supabase.auth.signInWithPassword({
-              email: "achrefmsd5@gmail.com",
-              password: "admin123",
-            });
-            
-            if (retryError) throw retryError;
+            // If the error is something else, throw it to be caught below
+            throw error;
           }
           
           toast.success("Admin signed in successfully!");
@@ -61,13 +63,44 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
           password,
         });
         
-        if (error) throw error;
+        if (error) {
+          // If it's an email confirmation error
+          if (error.message.includes("Email not confirmed")) {
+            toast.info("Please confirm your email before signing in. Check your inbox for a confirmation link.");
+            setLoading(false);
+            return;
+          }
+          
+          // For invalid credentials, we might want to check if the user exists
+          if (error.message.includes("Invalid login credentials") && email === "achrefmsd5@gmail.com") {
+            // Try to sign up the user
+            const { error: signUpError } = await supabase.auth.signUp({
+              email: "achrefmsd5@gmail.com",
+              password: "admin123", 
+            });
+            
+            if (!signUpError) {
+              toast.info("We've sent a confirmation email. Please check your inbox and confirm your email.");
+              setLoading(false);
+              return;
+            }
+          }
+          
+          throw error;
+        }
         
         toast.success("Signed in successfully!");
         navigate("/");
       } else if (view === "sign-up") {
-        // In a real app, this would be restricted to admin users
-        toast.info("Only company admins can create new accounts.");
+        // Handle sign up
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
+        
+        toast.success("Signup successful! Please check your email for confirmation.");
         setView("sign-in");
       } else if (view === "forgot-password") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -84,6 +117,7 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
         setView("sign-in");
       }
     } catch (error: any) {
+      console.error("Authentication error:", error);
       toast.error(error.message || "An error occurred during authentication");
     } finally {
       setLoading(false);

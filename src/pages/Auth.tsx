@@ -38,6 +38,15 @@ const Auth = () => {
           <AuthForm view={view} setView={setView} />
           
           <AuthFooter view={view} setView={setView} />
+          
+          <div className="mt-4 text-sm text-center">
+            <p className="text-gray-500">
+              Note: If you're experiencing "Email not confirmed" errors, please check your email for a verification link.
+            </p>
+            <p className="text-gray-500 mt-1">
+              For testing, try using email "achrefmsd5@gmail.com" with password "admin123".
+            </p>
+          </div>
         </div>
       </div>
       
