@@ -16,37 +16,52 @@ const Auth = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <div className="w-1/2 flex items-center justify-start px-12">
-        <div className="max-w-md space-y-8">
-          <div className="mt-8">
+        <div className="max-w-md w-full mx-auto space-y-8 animate-fade-in">
+          <div className="mt-10">
             <img 
               src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
               alt="Cedar Rose Logo" 
-              className="h-14 w-auto"
+              className="h-16 w-auto"
             />
-            <h2 className="mt-6 text-3xl font-bold tracking-tight text-blue-800">
-              {view === "sign-in" ? "Sign in to your account" : 
-              view === "sign-up" ? "Create a new account" : 
+            <h2 className="mt-8 text-3xl font-bold tracking-tight text-blue-800">
+              {view === "sign-in" ? "Welcome back" : 
+              view === "sign-up" ? "Create your account" : 
               view === "forgot-password" ? "Reset your password" :
               "Recover your username"}
             </h2>
+            <p className="mt-2 text-sm text-blue-600">
+              {view === "sign-in" ? "Sign in to access your account" : 
+              view === "sign-up" ? "Fill in your details to get started" : 
+              view === "forgot-password" ? "Enter your email to reset your password" :
+              "Enter your email to recover your username"}
+            </p>
           </div>
           
           <AuthInfoBanner />
           
-          <AuthForm view={view} setView={setView} />
+          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-md border border-blue-100">
+            <AuthForm view={view} setView={setView} />
+          </div>
           
           <AuthFooter view={view} setView={setView} />
         </div>
       </div>
       
-      <div className="w-1/2 flex items-center justify-center">
-        <img 
-          src="/lovable-uploads/fa66c7fb-df57-4008-b935-d09036cd3d9f.png" 
-          alt="Data Visualization" 
-          className="w-[90%] h-auto"
-        />
+      <div className="w-1/2 bg-blue-600 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 opacity-90"></div>
+        <div className="z-10 p-12 text-white mb-8">
+          <h3 className="text-2xl font-bold mb-3">Data-Driven Insights</h3>
+          <p className="text-blue-100 max-w-md">Access comprehensive analytics and visualizations to drive your business decisions.</p>
+        </div>
+        <div className="relative z-10 w-4/5">
+          <img 
+            src="/lovable-uploads/fa66c7fb-df57-4008-b935-d09036cd3d9f.png" 
+            alt="Data Visualization" 
+            className="w-full h-auto rounded-lg shadow-2xl"
+          />
+        </div>
       </div>
     </div>
   );

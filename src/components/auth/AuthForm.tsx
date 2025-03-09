@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Mail, Lock, User } from "lucide-react";
 
 type AuthFormProps = {
   view: "sign-in" | "sign-up" | "forgot-password" | "forgot-username";
@@ -125,54 +126,69 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
   };
 
   return (
-    <form className="mt-8 space-y-6" onSubmit={handleAuth}>
-      <div className="space-y-4 rounded-md shadow-sm">
+    <form className="space-y-5" onSubmit={handleAuth}>
+      <div className="space-y-4">
         {view === "sign-up" && (
-          <div>
+          <div className="space-y-2">
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
-              required={view === "sign-up"}
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="relative block w-full mt-1"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                required={view === "sign-up"}
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="pl-10 w-full"
+              />
+            </div>
           </div>
         )}
         
-        <div>
+        <div className="space-y-2">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="relative block w-full mt-1"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Mail className="h-5 w-5 text-gray-400" />
+            </div>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="pl-10 w-full"
+            />
+          </div>
         </div>
         
         {(view === "sign-in" || view === "sign-up") && (
-          <div>
+          <div className="space-y-2">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete={view === "sign-up" ? "new-password" : "current-password"}
-              required={view === "sign-in" || view === "sign-up"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="relative block w-full mt-1"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete={view === "sign-up" ? "new-password" : "current-password"}
+                required={view === "sign-in" || view === "sign-up"}
+                placeholder={view === "sign-up" ? "Create a password" : "Enter your password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10 w-full"
+              />
+            </div>
           </div>
         )}
       </div>
@@ -180,12 +196,12 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
       <div>
         <Button
           type="submit"
-          className="w-full bg-blue-700 hover:bg-blue-800"
+          className="w-full bg-blue-700 hover:bg-blue-800 transition-all duration-200"
           disabled={loading}
         >
-          {loading ? "Loading..." : 
+          {loading ? "Processing..." : 
           view === "sign-in" ? "Sign in" : 
-          view === "sign-up" ? "Sign up" : 
+          view === "sign-up" ? "Create account" : 
           view === "forgot-password" ? "Send reset instructions" :
           "Recover username"}
         </Button>
