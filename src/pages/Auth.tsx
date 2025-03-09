@@ -49,17 +49,13 @@ const Auth = () => {
         </div>
       </div>
       
-      <div className="w-1/2 bg-blue-600 flex flex-col items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 opacity-90"></div>
-        <div className="z-10 p-12 text-white mb-8">
-          <h3 className="text-2xl font-bold mb-3">Data-Driven Insights</h3>
-          <p className="text-blue-100 max-w-md">Access comprehensive analytics and visualizations to drive your business decisions.</p>
-        </div>
-        <div className="relative z-10 w-4/5">
+      <div className="w-1/2 bg-blue-600 flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-600 opacity-90"></div>
+        <div className="relative z-10 w-4/5 flex justify-center">
           <img 
             src="/lovable-uploads/fa66c7fb-df57-4008-b935-d09036cd3d9f.png" 
             alt="Data Visualization" 
-            className="w-full h-auto rounded-lg shadow-2xl"
+            className="w-auto h-auto rounded-lg shadow-2xl"
           />
         </div>
       </div>
