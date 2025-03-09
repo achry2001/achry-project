@@ -23,7 +23,7 @@ const Auth = () => {
             <img 
               src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
               alt="Cedar Rose Logo" 
-              className="h-16 w-auto mt-4"
+              className="h-16 w-auto"
             />
             <h2 className="mt-8 text-3xl font-bold tracking-tight text-blue-800">
               {view === "sign-in" ? "Welcome back" : 
@@ -49,14 +49,17 @@ const Auth = () => {
         </div>
       </div>
       
-      <div className="w-1/2 bg-blue-600 flex items-center justify-center">
-        <div className="text-white p-12 max-w-md">
-          <h3 className="text-2xl font-bold mb-4">Data-Driven Insights</h3>
-          <p className="text-blue-100 mb-8">Access comprehensive analytics and visualizations to drive your business decisions.</p>
+      <div className="w-1/2 bg-blue-600 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 opacity-90"></div>
+        <div className="z-10 p-12 text-white mb-8">
+          <h3 className="text-2xl font-bold mb-3">Data-Driven Insights</h3>
+          <p className="text-blue-100 max-w-md">Access comprehensive analytics and visualizations to drive your business decisions.</p>
+        </div>
+        <div className="relative z-10 w-4/5">
           <img 
-            src="/lovable-uploads/3bff204d-b72f-4749-8064-f99ff167bc7e.png" 
+            src="/lovable-uploads/fa66c7fb-df57-4008-b935-d09036cd3d9f.png" 
             alt="Data Visualization" 
-            className="w-full h-auto rounded-lg shadow-lg"
+            className="w-full h-auto rounded-lg shadow-2xl"
           />
         </div>
       </div>
