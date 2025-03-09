@@ -19,7 +19,7 @@ const Auth = () => {
     <div className="flex min-h-screen bg-white">
       <div className="w-1/2 flex items-center justify-start px-12">
         <div className="max-w-md space-y-8">
-          <div>
+          <div className="mt-8">
             <img 
               src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
               alt="Cedar Rose Logo" 
@@ -38,22 +38,13 @@ const Auth = () => {
           <AuthForm view={view} setView={setView} />
           
           <AuthFooter view={view} setView={setView} />
-          
-          <div className="mt-4 text-sm text-center">
-            <p className="text-gray-500">
-              Note: If you're experiencing "Email not confirmed" errors, please check your email for a verification link.
-            </p>
-            <p className="text-gray-500 mt-1">
-              For testing, try using email "achrefmsd5@gmail.com" with password "admin123".
-            </p>
-          </div>
         </div>
       </div>
       
       <div className="w-1/2 flex items-center justify-center">
         <img 
-          src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
-          alt="Company Logo" 
+          src="/lovable-uploads/fa66c7fb-df57-4008-b935-d09036cd3d9f.png" 
+          alt="Data Visualization" 
           className="w-[90%] h-auto"
         />
       </div>
