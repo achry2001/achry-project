@@ -19,6 +19,16 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const getRedirectURL = () => {
+    // Check if we're in a deployed environment vs development
+    const isDeployed = window.location.hostname.includes("lovable.app");
+    const baseURL = isDeployed ? 
+      "https://achry-project.lovable.app" : 
+      window.location.origin;
+    
+    return `${baseURL}/auth`;
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -93,10 +103,14 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
         toast.success("Signed in successfully!");
         navigate("/");
       } else if (view === "sign-up") {
-        // Handle sign up
+        // Handle sign up with proper redirect URL
+        const redirectTo = getRedirectURL();
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: redirectTo
+          }
         });
         
         if (error) throw error;
@@ -104,8 +118,9 @@ const AuthForm = ({ view, setView }: AuthFormProps) => {
         toast.success("Signup successful! Please check your email for confirmation.");
         setView("sign-in");
       } else if (view === "forgot-password") {
+        const redirectTo = getRedirectURL();
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/reset-password`,
+          redirectTo: redirectTo,
         });
         
         if (error) throw error;
