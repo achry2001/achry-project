@@ -1,5 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
@@ -18,39 +19,44 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Fetch the webpage
-    const response = await fetch("http://www.itda.gov.eg/jurnal-sgl.aspx");
-    if (!response.ok) {
-      throw new Error(`Failed to fetch webpage: ${response.statusText}`);
-    }
+    // Launch browser
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    
+    // Navigate to the page
+    await page.goto("http://www.itda.gov.eg/jurnal-sgl.aspx");
 
-    const html = await response.text();
+    // Wait for dropdown and select desired month/year
+    await page.waitForSelector('#DropDownList1');
+    await page.select('#DropDownList1', 'ديسمبر - 2024');
     
-    // Extract PDF links using regex
-    const pdfLinkRegex = /<a[^>]*href="([^"]*\.pdf)"[^>]*>([^<]+)<\/a>/g;
-    const matches = [...html.matchAll(pdfLinkRegex)];
-    
-    const processedPdfs = [];
-    
-    for (const [, pdfUrl, pdfName] of matches) {
+    // Wait for page to load after selection
+    await page.waitForTimeout(5000);
+
+    // Extract PDF links
+    const pdfLinks = await page.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('a[href$=".pdf"]'));
+      return links.map(link => ({
+        url: link.getAttribute('href'),
+        name: link.textContent?.trim() || 'Untitled'
+      }));
+    });
+
+    // Process each PDF
+    for (const pdf of pdfLinks) {
+      const baseUrl = "http://www.itda.gov.eg";
+      const fullUrl = pdf.url?.startsWith('http') ? pdf.url : `${baseUrl}/${pdf.url?.startsWith('/') ? pdf.url.slice(1) : pdf.url}`;
+      
       try {
-        const baseUrl = "http://www.itda.gov.eg";
-        const fullUrl = pdfUrl.startsWith('http') ? pdfUrl : `${baseUrl}/${pdfUrl.startsWith('/') ? pdfUrl.slice(1) : pdfUrl}`;
-        
-        console.log(`Downloading PDF from: ${fullUrl}`);
-        
         // Download PDF
-        const pdfResponse = await fetch(fullUrl);
-        if (!pdfResponse.ok) {
-          console.error(`Failed to fetch PDF: ${pdfResponse.statusText}`);
-          continue;
-        }
+        const response = await fetch(fullUrl);
+        if (!response.ok) throw new Error(`Failed to fetch PDF: ${response.statusText}`);
         
-        const pdfBlob = await pdfResponse.blob();
+        const pdfBlob = await response.blob();
         const buffer = await pdfBlob.arrayBuffer();
         
         // Upload to Supabase Storage
-        const fileName = `${pdfName.replace(/[^\x00-\x7F]/g, '')}_${Date.now()}.pdf`;
+        const fileName = `${pdf.name.replace(/[^\x00-\x7F]/g, '')}_${Date.now()}.pdf`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('pdf-storage')
           .upload(`pdfs/${fileName}`, buffer, {
@@ -58,44 +64,31 @@ serve(async (req) => {
             upsert: false
           });
 
-        if (uploadError) {
-          console.error(`Upload error for ${pdfName}:`, uploadError);
-          continue;
-        }
+        if (uploadError) throw uploadError;
 
         // Create database entry
         const { error: dbError } = await supabase
           .from('pdfs')
           .insert({
-            name: pdfName,
+            name: pdf.name,
             status: 'pending',
             url: uploadData?.path,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
 
-        if (dbError) {
-          console.error(`Database error for ${pdfName}:`, dbError);
-          continue;
-        }
+        if (dbError) throw dbError;
 
-        processedPdfs.push({ name: pdfName, url: uploadData?.path });
-        console.log(`Successfully processed: ${pdfName}`);
+        console.log(`Successfully processed: ${pdf.name}`);
       } catch (error) {
-        console.error(`Error processing PDF: ${error.message}`);
+        console.error(`Error processing ${pdf.name}:`, error);
       }
     }
 
-    if (processedPdfs.length === 0) {
-      throw new Error("No PDFs were successfully processed");
-    }
+    await browser.close();
 
     return new Response(
-      JSON.stringify({ 
-        message: 'PDF crawling completed successfully',
-        processed: processedPdfs.length,
-        pdfs: processedPdfs
-      }),
+      JSON.stringify({ message: 'PDF crawling completed successfully' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
 
