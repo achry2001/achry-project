@@ -24,6 +24,8 @@ serve(async (req) => {
       throw new Error("selectedValue is required and must be a string");
     }
 
+    console.log(`Received selectedValue: ${selectedValue}`);
+
     // Initialize Supabase client
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -35,10 +37,12 @@ serve(async (req) => {
     const page = await browser.newPage();
 
     // Navigate to the webpage
-    await page.goto("http://www.itda.gov.eg/jurnal-sgl.aspx");
+    await page.goto("http://www.itda.gov.eg/jurnal-sgl.aspx", { waitUntil: "networkidle0" });
 
-    // Wait for the dropdown to load and select the user-provided value
-    await page.waitForSelector("#DropDownList1");
+    // Wait for the dropdown to load
+    await page.waitForSelector("#DropDownList1", { timeout: 10000 });
+
+    // Select the user-provided value
     const selected = await page.select("#DropDownList1", selectedValue);
 
     // Verify the selection was successful
@@ -46,8 +50,15 @@ serve(async (req) => {
       throw new Error(`Failed to select value: ${selectedValue}`);
     }
 
-    // Wait for the page to load after selection
-    await page.waitForTimeout(5000);
+    // Log the selected value for verification
+    const currentValue = await page.evaluate(() => {
+      const select = document.querySelector("#DropDownList1");
+      return select ? select.value : null;
+    });
+    console.log(`Currently selected value: ${currentValue}`);
+
+    // Wait for PDF links to appear after selection
+    await page.waitForSelector('a[href$=".pdf"]', { timeout: 10000 });
 
     // Extract PDF links
     const pdfLinks = await page.evaluate(() => {
@@ -57,6 +68,13 @@ serve(async (req) => {
         name: link.textContent?.trim() || "Untitled",
       }));
     });
+
+    console.log(`Found ${pdfLinks.length} PDF links`);
+
+    // Check if any PDFs were found
+    if (pdfLinks.length === 0) {
+      throw new Error("No PDF links found for the selected date");
+    }
 
     // Process each PDF
     for (const pdf of pdfLinks) {
