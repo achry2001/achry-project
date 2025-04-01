@@ -7,8 +7,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
-import { AuthButton } from "@/components/AuthButton";
+import { Search, Bell } from "lucide-react";
 
 const sections = {
   gazette: [
@@ -23,18 +22,29 @@ const sections = {
 
 export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection: string; onSectionChange: (section: string) => void }) => {
   return (
-    <header className="w-full py-4 px-8 border-b border-gray-200 bg-white fixed top-0 left-0 right-0 z-40 shadow-sm">
+    <header className="w-full py-4 px-8 border-b border-gray-200 bg-white fixed top-16 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <img 
             src="/lovable-uploads/6ba42285-446f-44ff-bb3d-3e03ad6bade0.png" 
             alt="Cedar Rose Logo" 
-            className="h-10 w-auto mr-3"
+            className="h-8 w-auto mr-3"
           />
           <h1 className="text-2xl font-semibold text-blue-800">Cedar Rose Data Operations</h1>
         </div>
         
         <div className="flex items-center space-x-6">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-4 w-4 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="py-2 pl-10 pr-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+            />
+          </div>
+          
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -81,8 +91,6 @@ export const PDFHeader = ({ currentSection, onSectionChange }: { currentSection:
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
           </Button>
-          
-          <AuthButton />
         </div>
       </div>
     </header>
